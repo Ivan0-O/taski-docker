@@ -1,0 +1,15 @@
+Running with with net connected with podman (--net taski_net) WILL NOT WORK.
+
+Podman requires manual configuration of the connections:
+
+1. DB:
+```
+sudo docker run --name taski_db --hostname taski_db --net taski_net --env-file .env -d -v taski_data:/var/lib/postgresql/data postgres:13.10
+```
+I.e. should add `--hostname taski_db`
+
+2. Backend:
+After the DB container is started go do `docker inspect taski_db` and look for NetworkSettings.Networks.taski_net.IPAddress and remember it (NOT THE Gateway address).
+```
+sudo docker run --name taski_backend --hostname taski_backend --net taski_net --env-file .env -d -p 0.0.0.0:8000:8000 --add-host taski_db:IP_FROM_INSPECT_YOU_REMEMBERED taski_backend
+```
