@@ -1,5 +1,6 @@
 volumes:
   taski_data:
+  taski-static:
 
 services:
   db:
@@ -11,15 +12,25 @@ services:
   backend:
     build: ./backend/
     env_file: .env
+    volumes:
+      - taski-static:/backend_static/
     depends_on:
       - db
 
   frontend:
     build: ./frontend/
     env_file: .env
+    
+    volumes:
+      - taski-static:/frontend_static/
+    # Redefine CMD for frontend because we don't need the frontend server anymore
+    command:
+      cp -r /app/build/. /frontend_static/
 
   gateway:
     build: ./gateway/
+    volumes:
+      - taski-static:/staticfiles/
     depends_on:
       - backend
     ports:
